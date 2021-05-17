@@ -1,0 +1,393 @@
+<?xml version="1.0"?>
+<robot name="arm_v1" xmlns:xacro="http://ros.org/wiki/xacro">
+    <!-- Constants -->
+    <xacro:property name="pi" value="3.14159265"/>
+
+    <!-- Model Parameters -->
+
+
+    <!-- VISUAL PROPS -->
+    <material name="red">
+        <color rgba="1 0 0 1" />
+    </material>
+    <material name="green">
+        <color rgba="0 1 0 1" />
+    </material>
+    <material name="blue">
+        <color rgba="0 0 1 1" />
+    </material>
+    <material name="yellow">
+        <color rgba="1 1 0 1" />
+    </material>
+    <material name="black">
+        <color rgba="0 0 0 1" />
+    </material>
+    <material name="white">
+        <color rgba="1 1 1 1" />
+    </material>
+
+    <!-- INERTIAL FUNCTIONS -->
+    <xacro:macro name="default_inertial" params="mass">
+        <inertial>
+            <mass value="${mass}" />
+            <inertia 
+            ixx="1.0"   ixy="0.0"   ixz="0.0" 
+                        iyy="1.0"   iyz="0.0" 
+                                    izz="1.0"
+            />
+        </inertial>
+    </xacro:macro>
+
+    <xacro:macro name="cuboid_inertial" params="mass l w h">
+        <inertial>
+            <mass value="${mass}" />
+            <inertia 
+            ixx="${1/12*mass*(h*h + l*l)}"   ixy="0.0"   ixz="0.0" 
+                        iyy="${1/12*mass*(w*w + l*l)}"   iyz="0.0" 
+                                    izz="${1/12*mass*(w*w + h*h)}"
+            />
+        </inertial>
+    </xacro:macro>
+    
+    <xacro:macro name="cylinder_inertial" params="mass r h">
+        <inertial>
+            <mass value="${mass}" />
+            <inertia 
+            ixx="${1/12*mass*(3*r*r + h*h)}"   ixy="0.0"   ixz="0.0" 
+                        iyy="${1/12*mass*(3*r*r + h*h)}"   iyz="0.0" 
+                                    izz="${1/2*mass*(r*r)}"
+            />
+        </inertial>
+    </xacro:macro>
+
+    <!-- MODEL -->
+    <link name="base_link">
+        <visual>
+            <geometry>
+                <box size="0.15 0.15 0.005"/>                
+            </geometry>
+            
+            <material name="black"/>
+        </visual>
+
+        <collision>
+            <geometry>
+                <box size="0.15 0.15 0.005"/>                
+            </geometry>
+        </collision>
+    </link>
+
+    <joint name="base_rotate_joint" type="revolute">
+        <parent link="base_link"/>
+        <child link="base"/>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <axis xyz="0 0 1"/>
+        <limit effort="1000.0" lower="${-pi}" upper="${pi}" velocity="0.7"/>
+    </joint>
+    <link name="base">
+        <visual>
+            <origin xyz="0 0 0.0525"/>
+            <geometry>
+                <cylinder radius="0.06" length="0.1"/>                
+            </geometry>
+
+            <material name="black"/>
+        </visual>
+
+        <collision>
+            <origin xyz="0 0 0.0525"/>
+            <geometry>
+                <cylinder radius="0.06" length="0.1"/>                
+            </geometry>
+        </collision>
+    </link>
+
+    <joint name="shoulder_pitch_joint" type="revolute">
+        <parent link="base"/>
+        <child link="shoulder"/>
+        <origin xyz="0 0 0.1" rpy="0 0 0"/>
+        <axis xyz="1 0 0"/>
+        <limit effort="1000.0" lower="${-pi/2}" upper="${pi/2}" velocity="0.7"/>
+    </joint>
+    <link name="shoulder">
+        <visual>
+            <origin xyz="0 0 0.135"/>
+            <geometry>
+                <box size="0.03 0.03 0.3"/>                
+            </geometry>
+
+            <material name="yellow"/>
+        </visual>
+
+        <collision>
+            <origin xyz="0 0 0.135"/>
+            <geometry>
+                <box size="0.03 0.03 0.3"/>                
+            </geometry>
+        </collision>
+    </link>
+
+    <joint name="elbow_support_joint" type="fixed">
+        <parent link="shoulder"/>
+        <child link="elbow_support"/>
+        <origin xyz="0 0 0.285" rpy="0 0 0"/>
+    </joint>
+    <link name="elbow_support">
+        <visual>
+            <origin xyz="0 0 0.035"/>
+            <geometry>
+                <cylinder radius="0.03" length="0.1"/>                
+            </geometry>
+
+            <material name="black"/>
+        </visual>
+
+        <collision>
+            <origin xyz="0 0 0.035"/>
+            <geometry>
+                <cylinder radius="0.03" length="0.1"/>                
+            </geometry>
+        </collision>
+    </link>
+
+    <joint name="elbow_pitch_joint" type="revolute">
+        <parent link="elbow_support"/>
+        <child link="elbow"/>
+        <origin xyz="0 0 0.085" rpy="0 0 0"/>
+        <axis xyz="1 0 0"/>
+        <limit effort="1000.0" lower="${-3*pi/4}" upper="${3*pi/4}" velocity="0.7"/>
+    </joint>
+    <link name="elbow">
+        <visual>
+            <origin xyz="0 0 0.135"/>
+            <geometry>
+                <box size="0.03 0.03 0.3"/>                
+            </geometry>
+
+            <material name="yellow"/>
+        </visual>
+
+        <collision>
+            <origin xyz="0 0 0.135"/>
+            <geometry>
+                <box size="0.03 0.03 0.3"/>                
+            </geometry>
+        </collision>
+    </link>
+
+    <joint name="wrist_support_joint" type="fixed">
+        <parent link="elbow"/>
+        <child link="wrist_support"/>
+        <origin xyz="0 0 0.285" rpy="0 0 0"/>
+    </joint>
+    <link name="wrist_support">
+        <visual>
+            <origin xyz="0 0 0.035"/>
+            <geometry>
+                <cylinder radius="0.03" length="0.1"/>                
+            </geometry>
+
+            <material name="black"/>
+        </visual>
+
+        <collision>
+            <origin xyz="0 0 0.035"/>
+            <geometry>
+                <cylinder radius="0.03" length="0.1"/>                
+            </geometry>
+        </collision>
+    </link>
+
+    <joint name="wrist_pitch_joint" type="revolute">
+        <parent link="wrist_support"/>
+        <child link="wrist_pitch"/>
+        <origin xyz="0 0 0.085" rpy="0 0 0"/>
+        <axis xyz="1 0 0"/>
+        <limit effort="1000.0" lower="${-pi/2}" upper="${pi/2}" velocity="0.7"/>
+    </joint>
+    <link name="wrist_pitch">
+        <visual>
+            <origin xyz="0 0 0.03"/>
+            <geometry>
+                <box size="0.03 0.03 0.09"/>                
+            </geometry>
+
+            <material name="yellow"/>
+        </visual>
+
+        <collision>
+            <origin xyz="0 0 0.03"/>
+            <geometry>
+                <box size="0.03 0.03 0.09"/>                
+            </geometry>
+        </collision>
+    </link>
+
+    <joint name="eef_support_joint" type="fixed">
+        <parent link="wrist_pitch"/>
+        <child link="eef_support"/>
+        <origin xyz="0 0 0.075" rpy="0 0 0"/>
+    </joint>
+    <link name="eef_support">
+        <visual>
+            <origin xyz="0 0 0.035"/>
+            <geometry>
+                <cylinder radius="0.03" length="0.1"/>                
+            </geometry>
+
+            <material name="black"/>
+        </visual>
+
+        <collision>
+            <origin xyz="0 0 0.035"/>
+            <geometry>
+                <cylinder radius="0.03" length="0.1"/>                
+            </geometry>
+        </collision>
+    </link>
+
+    <joint name="eef_roll_joint" type="revolute">
+        <parent link="eef_support"/>
+        <child link="eef_roll"/>
+        <origin xyz="0 0 0.085" rpy="0 0 0"/>
+        <axis xyz="0 0 1"/>
+        <limit effort="1000.0" lower="${-pi}" upper="${pi}" velocity="0.7"/>
+    </joint>
+    <link name="eef_roll">
+        <visual>
+            <origin xyz="0 0 0.0025"/>
+            <geometry>
+                <cylinder radius="0.05" length="0.005"/>                
+            </geometry>
+
+            <material name="yellow"/>
+        </visual>
+
+        <collision>
+            <origin xyz="0 0 0.0025"/>
+            <geometry>
+                <cylinder radius="0.05" length="0.005"/>                
+            </geometry>
+        </collision>
+    </link>
+    
+    <joint name="eef_pitch_joint" type="revolute">
+        <parent link="eef_roll"/>
+        <child link="eef_pitch"/>
+        <origin xyz="0 0 0.025" rpy="0 0 0"/>
+        <axis xyz="1 0 0"/>
+        <limit effort="1000.0" lower="${-pi/4}" upper="${pi/4}" velocity="0.7"/>
+    </joint>
+    <link name="eef_pitch">
+        <visual>
+            <origin xyz="0 0 0"  rpy="0 ${pi/2} 0"/>
+            <geometry>
+                <cylinder radius="0.02" length="0.08"/>                
+            </geometry>
+
+            <material name="black"/>
+        </visual>
+
+        <collision>
+            <origin xyz="0 0 0" rpy="0 ${pi/2} 0"/>
+            <geometry>
+                <cylinder radius="0.02" length="0.08"/>                
+            </geometry>
+        </collision>
+    </link>
+
+    <joint name="gripper_attacher_joint" type="fixed">
+        <parent link="eef_pitch"/>
+        <child link="gripper_attacher"/>
+        <origin xyz="0 0 0.02" rpy="0 0 0"/>
+    </joint>
+    <link name="gripper_attacher">
+        <visual>
+            <origin xyz="0 0 0.005"/>
+            <geometry>
+                <box size="0.1 0.075 0.01"/>                
+            </geometry>
+
+            <material name="white"/>
+        </visual>
+
+        <collision>
+            <origin xyz="0 0 0.005"/>
+            <geometry>
+                <box size="0.1 0.075 0.01"/>                
+            </geometry>
+        </collision>
+    </link>
+    <joint name="gripper_support_joint" type="fixed">
+        <parent link="gripper_attacher"/>
+        <child link="gripper_support"/>
+        <origin xyz="0 0 0.01" rpy="0 0 0"/>
+    </joint>
+    <link name="gripper_support">
+        <visual>
+            <origin xyz="0 0 0.005"/>
+            <geometry>
+                <box size="0.1 0.04 0.01"/>                
+            </geometry>
+
+            <material name="green"/>
+        </visual>
+
+        <collision>
+            <origin xyz="0 0 0.005"/>
+            <geometry>
+                <box size="0.1 0.04 0.01"/>                
+            </geometry>
+        </collision>
+    </link>
+
+    <joint name="gripper_leftfinger_joint" type="prismatic">
+        <parent link="gripper_support"/>
+        <child link="gripper_leftfinger"/>
+        <origin xyz="-0.03 0 0.01" rpy="0 0 ${pi/2}"/>
+        <axis xyz="0 1 0"/>
+        <limit effort="1000.0" lower="0" upper="-0.02" velocity="0.7"/>
+    </joint>
+    <link name="gripper_leftfinger">
+        <visual>
+            <origin xyz="0 0 0.04"/>
+            <geometry>
+                <box size="0.02 0.02 0.1"/>                
+            </geometry>
+
+            <material name="blue"/>
+        </visual>
+
+        <collision>
+            <origin xyz="0 0 0.04"/>
+            <geometry>
+                <box size="0.02 0.02 0.1"/>                
+            </geometry>
+        </collision>
+    </link>
+
+    <joint name="gripper_rightfinger_joint" type="prismatic">
+        <parent link="gripper_support"/>
+        <child link="gripper_rightfinger"/>
+        <origin xyz="0.03 0 0.01" rpy="0 0 ${-pi/2}"/>
+        <axis xyz="0 1 0"/>
+        <limit effort="1000.0" lower="0" upper="-0.02" velocity="0.7"/>
+    </joint>
+    <link name="gripper_rightfinger">
+        <visual>
+            <origin xyz="0 0 0.04"/>
+            <geometry>
+                <box size="0.02 0.02 0.1"/>                
+            </geometry>
+
+            <material name="blue"/>
+        </visual>
+
+        <collision>
+            <origin xyz="0 0 0.04"/>
+            <geometry>
+                <box size="0.02 0.02 0.1"/>                
+            </geometry>
+        </collision>
+    </link>
+</robot>
