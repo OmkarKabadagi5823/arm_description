@@ -350,7 +350,7 @@
     </joint>
     <link name="gripper_leftfinger">
         <visual>
-            <origin xyz="0 0 0.04"/>
+            <origin xyz="0 0 0.05"/>
             <geometry>
                 <box size="0.02 0.02 0.1"/>                
             </geometry>
@@ -359,7 +359,7 @@
         </visual>
 
         <collision>
-            <origin xyz="0 0 0.04"/>
+            <origin xyz="0 0 0.05"/>
             <geometry>
                 <box size="0.02 0.02 0.1"/>                
             </geometry>
@@ -375,7 +375,7 @@
     </joint>
     <link name="gripper_rightfinger">
         <visual>
-            <origin xyz="0 0 0.04"/>
+            <origin xyz="0 0 0.05"/>
             <geometry>
                 <box size="0.02 0.02 0.1"/>                
             </geometry>
@@ -384,7 +384,7 @@
         </visual>
 
         <collision>
-            <origin xyz="0 0 0.04"/>
+            <origin xyz="0 0 0.05"/>
             <geometry>
                 <box size="0.02 0.02 0.1"/>                
             </geometry>
